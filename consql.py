@@ -42,6 +42,13 @@ def timedelta_to_time_str(td: timedelta) -> str:
         return f"{hours:02d}:{minutes:02d}"
     except (AttributeError, TypeError):
         return "00:00"
+def convert_location(location_key: str) -> str:
+    location_map = {
+        "Booking.pier": "水頭碼頭",
+        "Booking.airport": "尚義機場",
+    }
+    return location_map.get(location_key, location_key)  # 若無對應則回傳原值
+
 
 def get_all_bookings():
     connection = create_db_connection()
@@ -57,7 +64,7 @@ def get_all_bookings():
         time_delta = row.get("shuttle_time")  # 这里获取的是timedelta对象
         
         booking_info = {
-            "location": row.get("departure_loc", "未知"),
+            "location": convert_location(row.get("departure_loc", "未知")),
             "date": row.get("shuttle_date", "").strftime("%Y-%m-%d") if row.get("shuttle_date") else "",
             "time": timedelta_to_time_str(time_delta) if time_delta else "00:00"
         }
