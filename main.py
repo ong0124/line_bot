@@ -394,7 +394,7 @@ def handle_message(event: MessageEvent):
         reply_text = "如果您需要幫助，可以告訴我們您遇到的問題，我們會儘力協助您。☀️"
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text, quick_reply=quick_reply))
     elif any(keyword in event.message.text for keyword in ["你好", "hello", "您好", "哈喽", "Hi","Hello","hi"]):
-        reply_text = f"您好，{user_name}，歡迎使用我們金門通接駁服務！感謝您的選擇，如果您有任何問題或需要幫助，請隨時聯繫我們，我們將竭誠為您服務😊"
+        reply_text = f"您好，{user_name}，歡迎使用我們上車巴接駁服務！感謝您的選擇，如果您有任何問題或需要幫助，請隨時聯繫我們，我們將竭誠為您服務😊"
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text, quick_reply=quick_reply))
     elif "我收到提醒了" in user_message:
         reply_text = "感謝您的確認！如果有其他問題，隨時告訴我😊"
@@ -729,7 +729,7 @@ def handle_message(event: MessageEvent):
                 "contents": [
                     {
                         "type": "text",
-                        "text": "金門通",
+                        "text": "上車巴",
                         "weight": "bold",
                         "size": "xl",
                         "align": "center"
@@ -771,7 +771,7 @@ def handle_message(event: MessageEvent):
                     },
                     {
                         "type": "text",
-                        "text": "Powered by 金門通",
+                        "text": "Powered by 上車巴",
                         "size": "xxs",
                         "align": "center"
                     }
@@ -985,7 +985,7 @@ async def process_booking(user_id, booking_info, now, now_str, current_date, wee
                                 },
                                 {
                                     "type": "text",
-                                    "text": "Powered by 金門通",
+                                    "text": "Powered by 上車巴",
                                     "position": "relative",
                                     "align": "center",
                                     "size": "xxs",
