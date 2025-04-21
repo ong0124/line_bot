@@ -9,6 +9,12 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, FlexSendMessage
 from linebot.models import QuickReply, QuickReplyButton, MessageAction
 from dotenv import load_dotenv
+from Flex_message.customer_service import customer_service_flex
+from Flex_message.help_center import help_center_flex
+from Flex_message.info_confirm import booking_confirm_flex
+from Flex_message.noBookingFound import no_booking_flex_message
+from Flex_message.reminder import reminder_flex
+from Flex_message.whatService import get_service_flex
 from consql import *
 
 app = FastAPI()
@@ -112,154 +118,9 @@ def handle_message(event: MessageEvent):
         booking_date = '未知'
         booking_time_str = '未知'
 
-    #设置提醒功能
-    # if user_message.count(" ") >= 2:  # 验证格式 "YYYY-MM-DD HH:MM 地点"
-    #     try:
-    #         parts = user_message.split(" ", 2)
-    #         if len(parts) != 3:
-    #             raise ValueError("输入格式错误")
-    #         booking_date, booking_time, location = parts  # 解析用户输入
-    #         # 验证日期格式
-    #         datetime.strptime(booking_date, "%Y-%m-%d")  
-    #         # 验证时间格式
-    #         booking_time_obj = datetime.strptime(booking_time, "%H:%M").time()
-    #         # 保存预订信息
-    #         user_bookings[user_id] = {
-    #             "date": booking_date,
-    #             "time": booking_time_obj.strftime("%H:%M"),
-    #             "location": location
-    #         }
-    #         save_user_bookings()  # 保存数据到 JSON
-    #         reply_text = f"✅ 你的提醒時間已設置為 {booking_date} {booking_time} {location}，客服會提前 1 個小時提醒您"
-    #         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text), quick_reply=quick_reply)
-    #         #后台print
-    #         print(f"✅ 用户 {user_id} 预定了 {booking_date} {booking_time} 在 {location} 的提醒")
-    #     except ValueError:
-    #         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 請輸入正確的日期時間格式（YYYY-MM-DD HH:MM 地点）"), quick_reply=quick_reply)
-    
     #input message
     if any(keyword in event.message.text for keyword in ["人工电话", "人工","人工電話","客服电话","客服電話","联系客服","聯繫客服","客服"]):
-        flex_message = FlexSendMessage(
-            alt_text="【人工電話】",
-            contents = {
-                "type": "bubble",
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        {
-                            "type": "text",
-                            "text": "人工電話",
-                            "weight": "bold",
-                            "size": "xl",
-                            "align": "center"
-                        },
-                        {
-                            "type": "separator",
-                            "margin": "md"
-                        },
-                        {
-                            "type": "box",
-                            "layout": "vertical",
-                            "margin": "lg",
-                            "spacing": "sm",
-                            "contents": [
-                                {
-                                    "type": "box",
-                                    "layout": "baseline",
-                                    "spacing": "sm",
-                                    "contents": [
-                                        {
-                                            "type": "text",
-                                            "text": "在線時間：",
-                                            "color": "#aaaaaa",
-                                            "size": "sm",
-                                            "flex": 2
-                                        },
-                                        {
-                                            "type": "text",
-                                            "text": "上午 9:00 至晚上 6:00（北京時間）",
-                                            "wrap": True,
-                                            "color": "#666666",
-                                            "size": "sm",
-                                            "flex": 5,
-                                            "align": "start"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "type": "box",
-                                    "layout": "baseline",
-                                    "spacing": "sm",
-                                    "contents": [
-                                        {
-                                            "type": "text",
-                                            "text": "☎️電話：",
-                                            "color": "#aaaaaa",
-                                            "size": "sm",
-                                            "flex": 2
-                                        },
-                                        {
-                                            "type": "text",
-                                            "wrap": True,
-                                            "color": "#1981E9",
-                                            "size": "sm",
-                                            "flex": 5,
-                                            "align": "start",
-                                            "text": "2222-222-222",
-                                            "decoration": "underline"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "type": "box",
-                                    "layout": "baseline",
-                                    "spacing": "sm",
-                                    "contents": [
-                                        {
-                                            "type": "text",
-                                            "text": "如需幫助，請在此時間段內聯繫我們，我們將竭誠為您服務",
-                                            "wrap": True,
-                                            "color": "#666666",
-                                            "size": "sm",
-                                            "flex": 5,
-                                            "align": "center"
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "footer": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "sm",
-                    "contents": [
-                        {
-                            "type": "button",
-                            "style": "secondary",
-                            "height": "sm",
-                            "action": {
-                                "type": "uri",
-                                "label": "呼叫",
-                                "altUri": {
-                                    "desktop": "https://line.me/"
-                                },
-                                "uri": "tel:2222-222-222"
-                            }
-                        },
-                        {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [],
-                            "margin": "sm"
-                        }
-                    ],
-                    "flex": 0
-                }
-            }
-        )
+        flex_message = customer_service_flex()
         line_bot_api.reply_message(event.reply_token,flex_message)
     
     elif response_text:
@@ -271,124 +132,7 @@ def handle_message(event: MessageEvent):
 
     elif any(keyword in event.message.text for keyword in ["帮助", "幫助"]):
         print(f"用户昵称：{user_name} 用户ID：{user_id} 点击了帮助按钮")
-        flex_message = FlexSendMessage(
-            alt_text="【幫助中心】",
-            contents = {
-                "type": "bubble",
-                "header": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        {
-                            "type": "text",
-                            "text": "幫助中心",
-                            "weight": "bold",
-                            "size": "xl",
-                            "align": "center"
-                        },
-                        {
-                            "type": "separator",
-                            "margin": "md"
-                        },
-                        {
-                            "type": "text",
-                            "text": "如果您遇到任何問題，可以參考以下幫助信息。",
-                            "wrap": True,
-                            "size": "sm",
-                            "color": "#999999",
-                            "margin": "lg",
-                            "align": "start"
-                        },
-                        {
-                            "type": "separator",
-                            "margin": "md"
-                        }
-                    ]
-                },
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "sm",
-                    "paddingAll": "none",
-                    "paddingStart": "lg",
-                    "paddingEnd": "lg",
-                    "contents": [
-                        {
-                            "type": "button",
-                            "style": "primary",
-                            "margin": "sm",
-                            "action": {
-                                "type": "message",
-                                "label": "如何預約接駁車？",
-                                "text": "如何預約接駁車？"
-                            }
-                        },
-                        {
-                            "type": "button",
-                            "style": "primary",
-                            "margin": "sm",
-                            "action": {
-                                "type": "message",
-                                "label": "聯繫客服",
-                                "text": "聯繫客服"
-                            }
-                        },
-                        {
-                            "type": "button",
-                            "style": "primary",
-                            "margin": "sm",
-                            "action": {
-                                "type": "message",
-                                "label": "操作指南",
-                                "text": "如何修改我的預約信息？"
-                            }
-                        },
-                        {
-                            "type": "button",
-                            "style": "primary",
-                            "margin": "sm",
-                            "action": {
-                                "type": "message",
-                                "label": "服務時間",
-                                "text": "工作時間"
-                            }
-                        },
-                        {
-                            "type": "button",
-                            "style": "primary",
-                            "margin": "sm",
-                            "action": {
-                                "type": "uri",
-                                "label": "反饋和建議",
-                                "uri": "https://line.me/"
-                            }
-                        }
-                    ]
-                },
-                "footer": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        {
-                            "type": "text",
-                            "text": "我們的客服團隊工作時間為每天",
-                            "size": "sm",
-                            "wrap": True,
-                            "color": "#999999",
-                            "align": "center"
-                        },
-                        {
-                            "type": "text",
-                            "text": "9:00 AM - 6:00 PM",
-                            "size": "sm",
-                            "wrap": True,
-                            "color": "#999999",
-                            "align": "center"
-                        }
-                    ]
-                }
-            }
-        )
+        flex_message = help_center_flex(user_name, event.source.user_id)
         line_bot_api.reply_message(event.reply_token, flex_message)
     elif "旅行助手" in user_message:
         reply_text = "如果您需要幫助，可以告訴我們您遇到的問題，我們會儘力協助您。☀️"
@@ -415,60 +159,7 @@ def handle_message(event: MessageEvent):
      # 获取星期几的中文名称
      # 检查预约信息是否完整
         if not booking_date or booking_date == '未知' or not booking_time_str or booking_time_str == '未知' or not location or location == '未知':
-            no_booking_flex = FlexSendMessage(
-            alt_text="【未找到預約】",
-            contents={
-                "type": "bubble",
-                "size": "mega",
-                "hero": {
-                    "type": "image",
-                    "url": "https://img2.woyaogexing.com/2022/01/20/80ebbd0faa71430cb1e471e22eb63fea!400x400.jpeg",  # 这里替换成你的可爱表情包图片 URL
-                    "size": "full",
-                    "aspectRatio": "20:10",
-                    "aspectMode": "cover"
-                },
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        {
-                            "type": "text",
-                            "text": "目前沒有查詢到您的預約",
-                            "weight": "bold",
-                            "size": "xl",
-                            "align": "center",
-                            "color": "#757575",
-                            "margin": "sm"
-                        },
-                        {
-                            "type": "text",
-                            "text": "點擊下面按鈕安排一下～",
-                            "size": "md",
-                            "align": "center",
-                            "color": "#666666",
-                            "margin": "md"
-                        }
-                    ]
-                },
-                "footer": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        {
-                            "type": "button",
-                            "action": {
-                                "type": "uri",
-                                "label": "立即預約",
-                                "uri": liff_url
-                            },
-                            "style": "primary",
-                            "color": "#4CAF50"  # 绿色
-                        }
-                    ],
-                    "spacing": "sm"
-                }
-            }
-        )
+            no_booking_flex = no_booking_flex_message(liff_url)
 
             line_bot_api.reply_message(event.reply_token, no_booking_flex)
             return  # 直接返回，不发送预约详情
@@ -496,211 +187,7 @@ def handle_message(event: MessageEvent):
                 time_range = f"{booking_time.strftime('%H:%M')} - {end_time.strftime('%H:%M')}"
             except ValueError as e:
                 time_range = f'日期格式错误: {str(e)}'
-        
-        flex_message = FlexSendMessage(
-            alt_text="【預約信息】",
-                contents = {
-                            "type": "bubble",
-                            "size": "kilo",  # 使用更大的尺寸
-                            "hero": {
-                                "type": "image",
-                                "url": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1b/4a/d3/fb/caption.jpg?w=500&h=400&s=1",  # 替换为实际的接送服务图片URL
-                                "size": "full",
-                                "aspectRatio": "20:9",
-                                "aspectMode": "cover"
-                            },
-                            "body": {
-                                "type": "box",
-                                "layout": "vertical",
-                                "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "預約確認",
-                                        "weight": "bold",
-                                        "size": "xl",
-                                        "align": "center",
-                                        "color": "#1DB446",
-                                        "margin": "sm"
-                                    },
-                                    {
-                                        "type": "separator",
-                                        "margin": "md",
-                                        "color": "#EEEEEE"
-                                    },
-                                    {
-                                        "type": "box",
-                                        "layout": "vertical",
-                                        "margin": "lg",
-                                        "spacing": "md",
-                                        "contents": [
-                                            # 预约日期
-                                            {
-                                                "type": "box",
-                                                "layout": "horizontal",
-                                                "contents": [
-                                                    {
-                                                        "type": "box",
-                                                        "layout": "vertical",
-                                                        "contents": [
-                                                            {
-                                                                "type": "text",
-                                                                "text": "📅",
-                                                                "size": "sm",
-                                                                "align": "center"
-                                                            }
-                                                        ],
-                                                        "width": "40px"
-                                                    },
-                                                    {
-                                                        "type": "box",
-                                                        "layout": "vertical",
-                                                        "contents": [
-                                                            {
-                                                                "type": "text",
-                                                                "text": "接駁日期",
-                                                                "color": "#888888",
-                                                                "size": "sm"
-                                                            },
-                                                            {
-                                                                "type": "text",
-                                                                "text": f"{date_with_weekday}",
-                                                                "color": "#333333",
-                                                                "weight": "bold",
-                                                                "size": "md",
-                                                                "margin": "sm"
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            },
-                                            # 预约时间
-                                            {
-                                                "type": "box",
-                                                "layout": "horizontal",
-                                                "contents": [
-                                                    {
-                                                        "type": "box",
-                                                        "layout": "vertical",
-                                                        "contents": [
-                                                            {
-                                                                "type": "text",
-                                                                "text": "⏰",
-                                                                "size": "sm",
-                                                                "align": "center"
-                                                            }
-                                                        ],
-                                                        "width": "40px"
-                                                    },
-                                                    {
-                                                        "type": "box",
-                                                        "layout": "vertical",
-                                                        "contents": [
-                                                            {
-                                                                "type": "text",
-                                                                "text": "接駁時間",
-                                                                "color": "#888888",
-                                                                "size": "sm"
-                                                            },
-                                                            {
-                                                                "type": "text",
-                                                                "text": f"{time_range}",
-                                                                "color": "#333333",
-                                                                "weight": "bold",
-                                                                "size": "md",
-                                                                "margin": "sm"
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            },
-                                            # 接驳地点
-                                            {
-                                                "type": "box",
-                                                "layout": "horizontal",
-                                                "contents": [
-                                                    {
-                                                        "type": "box",
-                                                        "layout": "vertical",
-                                                        "contents": [
-                                                            {
-                                                                "type": "text",
-                                                                "text": "📍",
-                                                                "size": "sm",
-                                                                "align": "center"
-                                                            }
-                                                        ],
-                                                        "width": "40px"
-                                                    },
-                                                    {
-                                                        "type": "box",
-                                                        "layout": "vertical",
-                                                        "contents": [
-                                                            {
-                                                                "type": "text",
-                                                                "text": "接駁地點",
-                                                                "color": "#888888",
-                                                                "size": "sm"
-                                                            },
-                                                            {
-                                                                "type": "text",
-                                                                "text": f"{location}",
-                                                                "color": "#333333",
-                                                                "weight": "bold",
-                                                                "size": "md",
-                                                                "margin": "sm",
-                                                                "wrap": True
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "separator",
-                                        "margin": "md",
-                                        "color": "#EEEEEE"
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": "我們會提前30分鐘到達指定地點等候",
-                                        "color": "#888888",
-                                        "size": "xs",
-                                        "align": "center",
-                                        "margin": "lg",
-                                        "wrap": True
-                                    }
-                                ]
-                            },
-                            "footer": {
-                                "type": "box",
-                                "layout": "vertical",
-                                "contents": [
-                                    {
-                                        "type": "button",
-                                        "action": {
-                                            "type": "uri",
-                                            "label": "查看詳情 & 修改預約",
-                                            "uri": liff_url
-                                        },
-                                        "style": "link",
-                                        "height": "sm",
-                                        "margin": "sm"
-                                    }
-                                ],
-                                "spacing": "sm"
-                            },
-                            "styles": {
-                                "body": {
-                                    "backgroundColor": "#FFFFFF"
-                                },
-                                "footer": {
-                                    "backgroundColor": "#F9F9F9",
-                                    "separator": True
-                                }
-                            }
-                        })
-        # 发送消息
+        flex_message = booking_confirm_flex(date_with_weekday, time_range, location, liff_url)        # 发送消息
         line_bot_api.reply_message(event.reply_token, flex_message)
 
     elif any(keyword in event.message.text for keyword in ["服务", "预约", "小程序", "订票", "接驳","服務", "預約", "訂票", "接駁","APP","订单","訂單","app","我要预订","我要預訂"]):
@@ -708,78 +195,7 @@ def handle_message(event: MessageEvent):
         reply_text = "為了方便您的旅行，請通過我們的小程序進行訂票"
         reply_userid = user_id
         liff_url = "https://liff.line.me/2006997627-KaPeq5n1"
-        flex_message = FlexSendMessage(
-            alt_text="【小程序】",
-             contents={
-            "type": "bubble",
-            "hero": {
-                "type": "image",
-                "url": "https://mir-s3-cdn-cf.behance.net/projects/404/13647d144621821.Y3JvcCwyMDY3LDE2MTYsMCwxMDc.png",
-                "size": "full",
-                "aspectRatio": "20:13",
-                "aspectMode": "cover",
-                "action": {
-                    "type": "uri",
-                    "uri": liff_url
-                }
-            },
-            "body": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                    {
-                        "type": "text",
-                        "text": "上車巴",
-                        "weight": "bold",
-                        "size": "xl",
-                        "align": "center"
-                    },
-                    {
-                        "type": "separator",
-                        "margin": "xs"
-                    },
-                    {
-                        "type": "text",
-                        "text": "接駁服務",
-                        "align": "center",
-                        "size": "sm",
-                        "margin": "sm",
-                        "color": "#ACACAC"
-                    }
-                ]
-            },
-            "footer": {
-                "type": "box",
-                "layout": "vertical",
-                "spacing": "sm",
-                "contents": [
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "height": "sm",
-                        "action": {
-                            "type": "uri",
-                            "label": "點擊使用",
-                            "uri": liff_url
-                        }
-                    },
-                    {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [],
-                        "margin": "sm"
-                    },
-                    {
-                        "type": "text",
-                        "text": "Powered by 上車巴",
-                        "size": "xxs",
-                        "align": "center"
-                    }
-                ],
-                "flex": 0
-                }
-            }
-        )
+        flex_message = get_service_flex(liff_url)     
         line_bot_api.reply_message(event.reply_token, [TextSendMessage(text=reply_text), flex_message])
         print(reply_userid)
     else:
@@ -796,7 +212,6 @@ from linebot.models import FlexSendMessage
 
 # 模拟全局变量（你实际应该从数据库或 json 文件加载）
 user_bookings = {}
-
 async def send_reminder():
     """定时检查所有预约，并提前 60 分钟发送提醒"""
     now = datetime.now()
@@ -808,14 +223,14 @@ async def send_reminder():
     for user_id, bookings in list(user_bookings.items()):
         if isinstance(bookings, list):
             for booking in bookings:
-                await process_booking(user_id, booking, now, now_str, current_date, weekday_chinese)
+                await process_booking(user_id, booking, now_str, current_date, weekday_chinese)
         elif isinstance(bookings, dict):
-            await process_booking(user_id, bookings, now, now_str, current_date, weekday_chinese)
+                await process_booking(user_id, bookings, now_str, current_date, weekday_chinese)
         else:
             print(f"⚠️ 不支援的資料格式 for user {user_id}")
 
 
-async def process_booking(user_id, booking_info, now, now_str, current_date, weekday_chinese):
+async def process_booking(user_id, booking_info, now_str, current_date, weekday_chinese):
     location = booking_info.get('location', '未知')
     booking_date = booking_info.get('date')
     booking_time_str = booking_info.get('time')
@@ -835,180 +250,31 @@ async def process_booking(user_id, booking_info, now, now_str, current_date, wee
             booking_time = datetime.strptime(booking_time_str, "%H:%M").time()
             reminder_time = (datetime.combine(datetime.today(), booking_time) - timedelta(minutes=60)).strftime("%H:%M")
             date_with_weekday = f"{booking_date}({weekday_chinese})"
-
             if current_date == booking_date.strftime("%Y-%m-%d") and now_str == reminder_time:
                 print(f"📤 Sending reminder to: User {user_id} at {booking_date} {booking_time_str}, Location: {location}")
                 
                 end_time = (datetime.combine(datetime.today(), booking_time) + timedelta(minutes=60)).time()
                 time_range = f"{booking_time.strftime('%H:%M')} - {end_time.strftime('%H:%M')}"
-
-                flex_message = FlexSendMessage(
-                    alt_text="⏰ 接駁服務提醒",
-                    contents={
-                        "type": "bubble",
-                        "header": {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                                {
-                                    "type": "box",
-                                    "layout": "vertical",
-                                    "contents": [
-                                        {
-                                            "type": "text",
-                                            "text": "⏰ 接駁服務提醒",
-                                            "color": "#308EBD",
-                                            "weight": "bold"
-                                        },
-                                        {
-                                            "type": "separator",
-                                            "margin": "xxl"
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        "body": {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                                {
-                                    "type": "text",
-                                    "text": "接駁服務",
-                                    "weight": "bold",
-                                    "size": "xl"
-                                },
-                                {
-                                    "type": "box",
-                                    "layout": "vertical",
-                                    "margin": "lg",
-                                    "spacing": "sm",
-                                    "contents": [
-                                        {
-                                            "type": "box",
-                                            "layout": "baseline",
-                                            "spacing": "sm",
-                                            "contents": [
-                                                {
-                                                    "type": "text",
-                                                    "text": "接駁地點:",
-                                                    "color": "#aaaaaa",
-                                                    "size": "sm",
-                                                    "flex": 2
-                                                },
-                                                {
-                                                    "type": "text",
-                                                    "text": location,
-                                                    "wrap": True,
-                                                    "color": "#666666",
-                                                    "size": "sm",
-                                                    "flex": 5
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "box",
-                                            "layout": "baseline",
-                                            "spacing": "sm",
-                                            "contents": [
-                                                {
-                                                    "type": "text",
-                                                    "text": "日期：",
-                                                    "color": "#aaaaaa",
-                                                    "size": "sm",
-                                                    "flex": 1
-                                                },
-                                                {
-                                                    "type": "text",
-                                                    "text": date_with_weekday,
-                                                    "wrap": True,
-                                                    "color": "#666666",
-                                                    "size": "sm",
-                                                    "flex": 5
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "box",
-                                            "layout": "baseline",
-                                            "spacing": "sm",
-                                            "contents": [
-                                                {
-                                                    "type": "text",
-                                                    "text": "時間：",
-                                                    "color": "#aaaaaa",
-                                                    "size": "sm",
-                                                    "flex": 1
-                                                },
-                                                {
-                                                    "type": "text",
-                                                    "text": time_range,
-                                                    "wrap": True,
-                                                    "color": "#666666",
-                                                    "size": "sm",
-                                                    "flex": 5
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "separator",
-                                            "margin": "xxl"
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        "footer": {
-                            "type": "box",
-                            "layout": "vertical",
-                            "spacing": "sm",
-                            "contents": [
-                                {
-                                    "type": "button",
-                                    "style": "link",
-                                    "height": "sm",
-                                    "action": {
-                                        "type": "uri",
-                                        "label": "查看預約的預訂",
-                                        "uri": "https://liff.line.me/2006997627-KaPeq5n1"
-                                    }
-                                },
-                                {
-                                    "type": "button",
-                                    "style": "primary",
-                                    "height": "md",
-                                    "action": {
-                                        "type": "message",
-                                        "label": "回復： 我收到提醒了",
-                                        "text": "我收到提醒了"
-                                    }
-                                },
-                                {
-                                    "type": "text",
-                                    "text": "Powered by 上車巴",
-                                    "position": "relative",
-                                    "align": "center",
-                                    "size": "xxs",
-                                    "color": "#B3B3B3",
-                                    "margin": "md"
-                                }
-                            ],
-                            "paddingAll": "xl"
-                        }
-                    }
-                )
-
+                liff_url = "https://liff.line.me/2006997627-KaPeq5n1"
+                flex_message = reminder_flex(location, date_with_weekday, time_range, liff_url)
                 # 發送提醒訊息
-                line_bot_api.push_message(user_id, flex_message)
-
+                line_bot_api.push_message(user_id, flex_message)  
         except ValueError as e:
             print(f"⚠️ 時間格式錯誤: {booking_time_str}, Error: {e}")
     else:
         print(f"⚠️ 預約資料不完整 for user {user_id}: {booking_info}")
 
+
+
+
+
 async def schedule_checker():
     """定时任务：每 60 秒检查一次是否有需要提醒的用户"""
     while True:
+        print("🕐 正在執行 schedule_checker()")
+        global user_bookings
+        user_bookings = get_all_bookings()
+        print(f"最新的 user_bookings: {user_bookings}")
         await send_reminder()
         await asyncio.sleep(60)
 
@@ -1076,3 +342,30 @@ if __name__ == "__main__":
 
 # user_bookings = load_user_bookings()
 # save_user_bookings()
+
+
+#line 121
+#设置提醒功能
+    # if user_message.count(" ") >= 2:  # 验证格式 "YYYY-MM-DD HH:MM 地点"
+    #     try:
+    #         parts = user_message.split(" ", 2)
+    #         if len(parts) != 3:
+    #             raise ValueError("输入格式错误")
+    #         booking_date, booking_time, location = parts  # 解析用户输入
+    #         # 验证日期格式
+    #         datetime.strptime(booking_date, "%Y-%m-%d")  
+    #         # 验证时间格式
+    #         booking_time_obj = datetime.strptime(booking_time, "%H:%M").time()
+    #         # 保存预订信息
+    #         user_bookings[user_id] = {
+    #             "date": booking_date,
+    #             "time": booking_time_obj.strftime("%H:%M"),
+    #             "location": location
+    #         }
+    #         save_user_bookings()  # 保存数据到 JSON
+    #         reply_text = f"✅ 你的提醒時間已設置為 {booking_date} {booking_time} {location}，客服會提前 1 個小時提醒您"
+    #         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text), quick_reply=quick_reply)
+    #         #后台print
+    #         print(f"✅ 用户 {user_id} 预定了 {booking_date} {booking_time} 在 {location} 的提醒")
+    #     except ValueError:
+    #         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 請輸入正確的日期時間格式（YYYY-MM-DD HH:MM 地点）"), quick_reply=quick_reply)
