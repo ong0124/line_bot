@@ -8,7 +8,7 @@ def no_booking_flex_message(liff_url: str) -> FlexSendMessage:
             "size": "mega",
             "hero": {
                 "type": "image",
-                "url": "https://img2.woyaogexing.com/2022/01/20/80ebbd0faa71430cb1e471e22eb63fea!400x400.jpeg",
+                "url": "https://i.imgur.com/oBm5fkC.png",
                 "size": "full",
                 "aspectRatio": "20:10",
                 "aspectMode": "cover"

@@ -8,7 +8,7 @@ def booking_confirm_flex(date_with_weekday: str, time_range: str, location: str,
             "size": "kilo",
             "hero": {
                 "type": "image",
-                "url": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1b/4a/d3/fb/caption.jpg?w=500&h=400&s=1",
+                "url": "https://i.imgur.com/q1FFp2Z.png",
                 "size": "full",
                 "aspectRatio": "20:9",
                 "aspectMode": "cover"

@@ -245,7 +245,7 @@ async def process_booking(user_id, booking_info, now_str, current_date, weekday_
             booking_time = datetime.strptime(booking_time_str, "%H:%M").time()
             reminder_time = (datetime.combine(datetime.today(), booking_time) - timedelta(minutes=60)).strftime("%H:%M")
             date_with_weekday = f"{booking_date}({weekday_chinese})"
-            if current_date == booking_date.strftime("%Y-%m-%d") and now_str == reminder_time:
+            if current_date == booking_date.strftime("%Y-%m-%d") and reminder_time <= now_str <= booking_time:
                 print(f"📤 Sending reminder to: User {user_id} at {booking_date} {booking_time_str}, Location: {location}")
                 
                 end_time = (datetime.combine(datetime.today(), booking_time) + timedelta(minutes=60)).time()
