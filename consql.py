@@ -5,6 +5,7 @@ from mysql.connector import Error
 from dotenv import load_dotenv
 from datetime import timedelta 
 import os
+from datetime import datetime, timedelta
 
 # 加载 .env 配置
 load_dotenv()
@@ -51,9 +52,12 @@ def convert_location(location_key: str) -> str:
 
 
 def get_all_bookings():
+    today = datetime.now().date()
+
     connection = create_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM booking ORDER BY LineID;")
+
+    cursor.execute("SELECT * FROM booking WHERE DATE(shuttle_date) = %s ORDER BY LineID;", (today,))
     results = cursor.fetchall()
     cursor.close()
     connection.close()

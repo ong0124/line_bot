@@ -145,11 +145,6 @@ def handle_message(event: MessageEvent):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text,quick_reply=quick_reply))
         print(f"✅ 用户 {user_name} 用户ID：{user_id} 确认收到了提醒")
 
-    elif any(keyword in event.message.text for keyword in ["测试", "測試"]):
-        print(f'⚙️用户ID: {user_id} , 用户昵称: {user_name}')
-        reply_text = "請發送提醒時間（格式：YYYY-MM-DD HH:MM 地点）如：2025-07-22 22:22 國際機場 / 2022-02-22 22:22 迪斯尼樂園。客服會提前 1 個小時提醒您！"
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text, quick_reply=quick_reply))
-
     elif any(keyword in event.message.text for keyword in ["我的预约", "我的預約"]):
      # 定义Flex消息
         liff_url = "https://liff.line.me/2006997627-KaPeq5n1"
@@ -276,7 +271,7 @@ async def schedule_checker():
         user_bookings = get_all_bookings()
         print(f"最新的 user_bookings: {user_bookings}")
         await send_reminder()
-        await asyncio.sleep(60)
+        await asyncio.sleep(1800)
 
 @app.on_event("startup")
 async def startup_event():
@@ -369,3 +364,9 @@ if __name__ == "__main__":
     #         print(f"✅ 用户 {user_id} 预定了 {booking_date} {booking_time} 在 {location} 的提醒")
     #     except ValueError:
     #         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="⚠️ 請輸入正確的日期時間格式（YYYY-MM-DD HH:MM 地点）"), quick_reply=quick_reply)
+
+#line 148
+    # elif any(keyword in event.message.text for keyword in ["测试", "測試"]):
+    #     print(f'⚙️用户ID: {user_id} , 用户昵称: {user_name}')
+    #     reply_text = "請發送提醒時間（格式：YYYY-MM-DD HH:MM 地点）如：2025-07-22 22:22 國際機場 / 2022-02-22 22:22 迪斯尼樂園。客服會提前 1 個小時提醒您！"
+    #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text, quick_reply=quick_reply))
